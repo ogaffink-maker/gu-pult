@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Пульт управляющего · Gastro Ultima</title>
+<meta name="description" content="Показатели смены, сигналы и отчёты заведения по данным iiko">
+<meta name="theme-color" content="#0E0E0E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Пульт">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="fonts/manrope.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><span class="wm">Gastro Ultima</span><small>Пульт управляющего</small></div>
+    <div class="venue">
+      <div class="venue-cur"><span class="dot live"></span><div><b id="vName"></b><small id="vCity"></small></div></div>
+      <div class="venue-next"><span class="dot"></span><div><b id="vNext"></b><small>подключение по запросу</small></div></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <button class="btn-ghost install" id="installBtn" hidden><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Установить приложение</button>
+      <div class="sync"><span class="dot live"></span><span>Данные iiko · <b id="syncTime"></b></span></div>
+      <button class="logout" onclick="pultLogout()"><span id="who"></span> · Выйти</button>
+    </div>
+  </aside>
+
+  <header class="mbar">
+    <div class="mbar-venue"><span class="wm" id="mName"></span><small id="mDate"></small></div>
+    <a class="bell" href="#/notify" aria-label="Уведомления"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg><i id="bellCount"></i></a>
+  </header>
+
+  <main class="main" id="main"></main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="toast" id="toast"></div>
+<script src="auth.js"></script>
+</body>
+</html>
