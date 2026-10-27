@@ -1,6 +1,6 @@
 /* Service worker: офлайн-кэш оболочки и показ уведомлений.
    В рабочей версии сюда же приходит событие push от сервера (Web Push, VAPID). */
-const CACHE = "pult-v3";
+const CACHE = "pult-v4";
 const SHELL = ["./", "index.html", "app.css", "app.js", "auth.js", "data.enc.json", "manifest.webmanifest", "fonts/manrope.css", "icons/icon-192.png", "icons/badge-72.png"];
 
 self.addEventListener("install", (e) => {

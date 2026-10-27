@@ -615,50 +615,40 @@
       toast("Отчёт отправлен на это устройство");
     } catch (e) { toast("Не удалось показать уведомление"); }
   }
-  let deferred = null;
-  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferred = e; $("#installBtn").hidden = false; installSheet(); });
+  /* Установка: событие beforeinstallprompt ловит auth.js ещё до входа (window.__bip) */
+  const ENV = window.PULT_ENV || { mobile: matchMedia("(max-width: 767px)").matches };
+  const bip = () => window.__bip;
+  if (bip()) $("#installBtn").hidden = false;
+  document.addEventListener("pult-bip", () => { $("#installBtn").hidden = false; });
   async function doInstall() {
-    if (!deferred) return;
-    deferred.prompt();
-    const r = await deferred.userChoice;
-    deferred = null; $("#installBtn").hidden = true; closeSheet();
-    if (r.outcome === "accepted") toast("Значок «Пульт» появится на главном экране");
+    const e = bip();
+    if (!e) { const s = $("#sheetSteps"); if (s && window.pultInstall) { s.innerHTML = window.pultInstall.steps(); s.hidden = false; const c = s.querySelector("[data-copy]"); if (c) c.onclick = async () => { try { await navigator.clipboard.writeText(location.href.split("#")[0]); toast("Ссылка скопирована"); } catch (x) { toast(location.href.split("#")[0]); } }; } return; }
+    e.prompt();
+    const r = await e.userChoice;
+    window.__bip = null; $("#installBtn").hidden = true; closeSheet();
+    if (r.outcome === "accepted") toast("Значок «Пульт» появился на главном экране");
   }
   $("#installBtn").onclick = doInstall;
   window.addEventListener("appinstalled", () => { closeSheet(); $("#installBtn").hidden = true; });
 
-  /* Предложение установить на телефоне: Android — кнопка, iPhone — подсказка (Apple не даёт ставить кнопкой) */
-  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-  const ua = navigator.userAgent;
-  const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  const isIOSSafari = isIOS && !/CriOS|FxiOS|EdgiOS|YaBrowser|OPiOS/.test(ua);
-  const isMobile = matchMedia("(max-width: 767px)").matches || /Android|iPhone|iPad/.test(ua);
-  const SHEET_KEY = "hadia-install-dismissed";
-  const dismissed = () => { try { return Date.now() - (+localStorage.getItem(SHEET_KEY) || 0) < 864e5; } catch (e) { return false; } };
+  /* На телефоне, пока пульт открыт в браузере, первым делом предлагаем поставить значок */
+  const SHEET_KEY = "pult-install-dismissed";
+  const dismissed = () => { try { return sessionStorage.getItem(SHEET_KEY) === "1"; } catch (e) { return false; } };
   function closeSheet() { const s = $("#sheet"); if (s) { s.classList.remove("on"); setTimeout(() => s.remove(), 250); } }
   function installSheet() {
-    if (standalone || !isMobile || dismissed() || $("#sheet")) return;
-    let body;
-    if (deferred) {
-      body = `<p>Пульт откроется одним касанием с главного экрана, а отчёты смены будут приходить уведомлениями.</p><button class="btn y wide" id="sheetGo">${ico("phone")}Установить приложение</button>`;
-    } else if (isIOSSafari) {
-      body = `<p>На iPhone значок добавляется вручную — это займёт 10 секунд:</p><ol class="steps-i"><li>Нажмите <b>«Поделиться»</b> <span class="ios-share">${ico("share")}</span> внизу экрана</li><li>Выберите <b>«На экран „Домой“»</b> и нажмите «Добавить»</li><li>Откройте «Пульт» с главного экрана и разрешите уведомления</li></ol>`;
-    } else if (isIOS) {
-      body = `<p>Чтобы установить пульт на iPhone, откройте эту ссылку в <b>Safari</b> — в других браузерах на iPhone значок с уведомлениями не работает.</p><button class="btn l wide" id="sheetCopy">Скопировать ссылку</button>`;
-    } else return;
+    if (ENV.standalone || !ENV.mobile || dismissed() || $("#sheet")) return;
     const el = document.createElement("div");
     el.id = "sheet"; el.className = "sheet";
-    el.innerHTML = `<div class="sheet-in"><button class="sheet-x" aria-label="Закрыть">×</button><div class="sheet-h"><img src="icons/icon-192.png" alt=""><div><b>Пульт управляющего</b><small>Установите на телефон</small></div></div>${body}</div>`;
+    el.innerHTML = `<div class="sheet-in"><button class="sheet-x" aria-label="Закрыть">×</button><div class="sheet-h"><img src="icons/icon-192.png" alt=""><div><b>Установите пульт на телефон</b><small>Значок на главном экране, отчёты смены — уведомлениями</small></div></div><button class="btn y wide" id="sheetGo">${ico("phone")}Установить на телефон</button><div class="gi-steps" id="sheetSteps" hidden></div></div>`;
     document.body.appendChild(el);
     setTimeout(() => el.classList.add("on"), 30);
-    el.querySelector(".sheet-x").onclick = () => { try { localStorage.setItem(SHEET_KEY, Date.now()); } catch (e) { /* без сохранения */ } closeSheet(); };
-    const go = el.querySelector("#sheetGo"); if (go) go.onclick = doInstall;
-    const cp = el.querySelector("#sheetCopy"); if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(location.href); toast("Ссылка скопирована — вставьте её в Safari"); } catch (e) { toast(location.href); } };
+    el.querySelector(".sheet-x").onclick = () => { try { sessionStorage.setItem(SHEET_KEY, "1"); } catch (e) { /* без сохранения */ } closeSheet(); };
+    el.querySelector("#sheetGo").onclick = doInstall;
   }
-  if (isIOS) setTimeout(installSheet, 1500);
+  setTimeout(installSheet, 600);
 
   /* В установленном приложении — один раз предложить включить уведомления */
-  if (standalone && "Notification" in window && Notification.permission === "default") {
+  if (ENV.standalone && "Notification" in window && Notification.permission === "default") {
     setTimeout(() => {
       const el = document.createElement("div");
       el.id = "sheet"; el.className = "sheet";

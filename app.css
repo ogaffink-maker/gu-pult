@@ -335,8 +335,8 @@ table.t tr.hl td { background: var(--yellow-soft); }
 .ios-share { display: inline-grid; place-items: center; width: 22px; height: 22px; vertical-align: -5px; }
 .ios-share svg { width: 18px; height: 18px; fill: none; stroke: #2a78d6; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 /* ---------- вход ---------- */
-#gate { position: fixed; inset: 0; z-index: 300; background: var(--night); display: grid; place-items: center; padding: 20px; overflow-y: auto; }
-.gate-card { width: 100%; max-width: 380px; background: var(--surface); border-radius: 22px; padding: 28px 26px 24px; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+#gate { position: fixed; inset: 0; z-index: 300; background: var(--night); display: grid; place-items: center; padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); overflow-y: auto; }
+.gate-card { width: 100%; background: var(--surface); border-radius: 22px; padding: 28px 26px 24px; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
 .gate-brand { margin-bottom: 26px; }
 .gate-brand .wm { color: var(--ink); font-size: 12px; }
 .gate-brand small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 3px; font-weight: 600; }
@@ -350,3 +350,20 @@ table.t tr.hl td { background: var(--yellow-soft); }
 .gate-err { min-height: 20px; color: var(--critical-ink); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
 .logout { color: #8A857B; font-size: 12px; font-weight: 600; text-align: left; padding: 0 8px; }
 .logout:hover { color: #fff; }
+/* ---------- установка на экране входа ---------- */
+.gate-wrap { width: 100%; max-width: 380px; display: grid; gap: 12px; }
+.gate-install { background: var(--yellow); border-radius: 22px; padding: 18px 18px 16px; color: var(--ink); }
+.gi-h { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+.gi-h img { width: 52px; height: 52px; border-radius: 13px; flex: none; }
+.gi-h b { font-size: 16px; display: block; line-height: 1.25; }
+.gi-h small { font-size: 12.5px; color: #4A3A00; font-weight: 600; }
+.gate-install .btn.y { background: var(--ink); color: #fff; }
+.gi-steps { margin-top: 14px; background: rgba(255,255,255,.75); border-radius: 14px; padding: 14px; font-size: 13.5px; }
+.gi-steps p { font-size: 13.5px; margin-bottom: 10px; color: var(--ink); }
+.gi-steps .steps-i { gap: 9px; }
+.gi-steps .btn { margin-top: 12px; }
+.gi-note { font-size: 12px !important; color: var(--muted) !important; margin: 10px 0 0 !important; }
+.gi-ico { display: inline-block; width: 18px; height: 18px; vertical-align: -4px; fill: none; stroke: #2a78d6; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.gi-done { font-size: 14px; line-height: 1.5; }
+.sheet { z-index: 400; }
+.sheet .gi-steps { background: var(--sand); }
